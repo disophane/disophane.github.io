@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- SECTION: Meta -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Website Status & Network Inspector</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="gradient-mesh">
+    <div class="floating-shape" aria-hidden="true"></div>
+    <div class="app-shell grain">
+      <!-- SECTION: Header -->
+      <header class="app-header">
+        <div>
+          <h1>Website Status & Network Inspector</h1>
+          <p class="subtitle">
+            Enter any URL or IP address to probe its status, response details, and
+            network behavior — all from your browser.
+          </p>
+        </div>
+        <div class="accent-line" aria-hidden="true"></div>
+      </header>
+
+      <!-- SECTION: Main Layout -->
+      <main class="layout">
+        <!-- SECTION: Probe Form -->
+        <section class="panel panel-form gradient-border shadow-soft">
+          <h2>Run a check</h2>
+          <p class="panel-description">
+            Paste a website URL like
+            <code>https://example.com</code> or an IP like <code>8.8.8.8</code>.
+            The inspector will attempt a fetch, simulate ping rounds, and show a
+            readable summary.
+          </p>
+
+          <form id="probe-form" class="probe-form" novalidate>
+            <div class="field-group">
+              <label for="target-input">URL or IP address</label>
+              <div class="input-row">
+                <span class="pill pill-mode" id="input-mode-label">Auto detect</span>
+                <input
+                  id="target-input"
+                  name="target"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="https://example.com or 1.1.1.1"
+                  required
+                />
+                <button type="submit" class="btn btn-primary">
+                  <span class="btn-label">Run check</span>
+                  <span class="spinner" id="submit-spinner" aria-hidden="true"></span>
+                </button>
+              </div>
+              <p class="field-hint">
+                Tip: If you omit <code>http://</code> or <code>https://</code>,
+                we'll assume <code>https://</code>.
+              </p>
+              <p class="field-error" id="input-error" role="alert"></p>
+            </div>
+
+            <div class="field-row field-options">
+              <label class="checkbox">
+                <input type="checkbox" id="follow-redirects" checked />
+                <span>Follow redirects</span>
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" id="include-headers" checked />
+                <span>Capture response headers</span>
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" id="run-multiple-pings" checked />
+                <span>Simulate 5 ping rounds</span>
+              </label>
+            </div>
+          </form>
+        </section>
+
+        <!-- SECTION: Results -->
+        <section class="panel panel-results shadow-soft" aria-live="polite">
+          <div class="results-header">
+            <h2>Results</h2>
+            <button id="reset-button" class="btn btn-ghost" type="button">
+              Clear
+            </button>
+          </div>
+
+          <!-- Summary & core status -->
+          <div class="results-grid">
+            <article class="card card-status">
+              <h3>Overall status</h3>
+              <div id="status-summary" class="status-summary empty">
+                <p>No checks yet. Run your first probe to see details here.</p>
+              </div>
+            </article>
+
+            <article class="card card-http">
+              <h3>HTTP & network</h3>
+              <dl class="kv-list" id="http-details">
+                <div class="kv-row skeleton-row">
+                  <dt>Status code</dt>
+                  <dd>—</dd>
+                </div>
+                <div class="kv-row skeleton-row">
+                  <dt>Total time</dt>
+                  <dd>—</dd>
+                </div>
+                <div class="kv-row skeleton-row">
+                  <dt>Method</dt>
+                  <dd>GET</dd>
+                </div>
+                <div class="kv-row skeleton-row">
+                  <dt>Final URL</dt>
+                  <dd>—</dd>
+                </div>
+              </dl>
+            </article>
+
+            <article class="card card-host">
+              <h3>Host & IP (best effort)</h3>
+              <dl class="kv-list" id="host-details">
+                <div class="kv-row skeleton-row">
+                  <dt>Host</dt>
+                  <dd>—</dd>
+                </div>
+                <div class="kv-row skeleton-row">
+                  <dt>IP address</dt>
+                  <dd>—</dd>
+                </div>
+                <div class="kv-row skeleton-row">
+                  <dt>Location</dt>
+                  <dd>—</dd>
+                </div>
+                <div class="kv-row skeleton-row">
+                  <dt>Reverse lookup</dt>
+                  <dd>—</dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+
+          <!-- Network behavior timeline -->
+          <section class="timeline-section">
+            <div class="timeline-header">
+              <h3>Network behavior timeline</h3>
+              <p class="timeline-caption">
+                Approximate breakdown of the request, based on browser timing
+                where available and simulated network phases.
+              </p>
+            </div>
+            <div class="timeline-wrapper">
+              <ol class="timeline" id="network-timeline">
+                <li class="timeline-item timeline-placeholder">
+                  <span class="bar"></span>
+                  <div class="meta">
+                    <div class="label">Waiting for first check…</div>
+                    <div class="detail">
+                      Once you run a probe, you'll see DNS, connect, TLS, and
+                      response phases here.
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </section>
+
+          <!-- Ping rounds -->
+          <section class="ping-section">
+            <div class="ping-header">
+              <h3>Simulated ping rounds</h3>
+              <p class="ping-caption">
+                Browser JavaScript cannot send ICMP ping packets, but we can run
+                multiple lightweight fetches to estimate latency.
+              </p>
+            </div>
+            <div class="ping-body">
+              <ul class="ping-list" id="ping-list"></ul>
+              <div class="ping-summary" id="ping-summary"></div>
+            </div>
+          </section>
+
+          <!-- Raw details -->
+          <section class="raw-section">
+            <h3>Raw response details</h3>
+            <textarea
+              id="raw-details"
+              class="raw-output"
+              spellcheck="false"
+              readonly
+            ></textarea>
+          </section>
+        </section>
+
+
+    <!-- SECTION: Scripts -->
+    <script src="script.js"></script>
+  </body>
+</html>
