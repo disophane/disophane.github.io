@@ -328,8 +328,34 @@ if (heroCard) {
     const repelStrength = 20;
 
     // Update particle velocities and positions
-    for (let i = 0; i < CONFIG.PARTICLE_COUNT; i++) {
-      const i3 = i * 3;
+for (let i = 0; i < CONFIG.PARTICLE_COUNT; i++) {
+  const i3 = i * 3;
+
+  // random drift (safe)
+  velocities[i3] += (Math.random() - 0.5) * 0.2;
+  velocities[i3 + 1] += (Math.random() - 0.5) * 0.2;
+  velocities[i3 + 2] += (Math.random() - 0.5) * 0.2;
+
+  // damping (stability)
+  velocities[i3] *= 0.97;
+  velocities[i3 + 1] *= 0.97;
+  velocities[i3 + 2] *= 0.97;
+
+  // apply movement
+  arr[i3] += velocities[i3] * delta;
+  arr[i3 + 1] += velocities[i3 + 1] * delta;
+  arr[i3 + 2] += velocities[i3 + 2] * delta;
+
+  // ✅ HARD BOUNDARY FIX (CRITICAL)
+  if (arr[i3] > halfX) { arr[i3] = halfX; velocities[i3] *= -1; }
+  if (arr[i3] < -halfX) { arr[i3] = -halfX; velocities[i3] *= -1; }
+
+  if (arr[i3 + 1] > halfY) { arr[i3 + 1] = halfY; velocities[i3 + 1] *= -1; }
+  if (arr[i3 + 1] < -halfY) { arr[i3 + 1] = -halfY; velocities[i3 + 1] *= -1; }
+
+  if (arr[i3 + 2] > halfZ) { arr[i3 + 2] = halfZ; velocities[i3 + 2] *= -1; }
+  if (arr[i3 + 2] < -halfZ) { arr[i3 + 2] = -halfZ; velocities[i3 + 2] *= -1; }
+}
       
       // Add random drift forces
       velocities[i3] += (Math.random() - 0.5) * 0.3;
