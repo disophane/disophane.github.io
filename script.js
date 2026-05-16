@@ -331,6 +331,22 @@ if (heroCard) {
 for (let i = 0; i < CONFIG.PARTICLE_COUNT; i++) {
   const i3 = i * 3;
 
+  const posAttr = geometry.getAttribute('position');
+const arr = posAttr.array;
+
+// keep particles visually anchored toward camera depth zone
+const depthClamp = 20;
+
+for (let i = 0; i < CONFIG.PARTICLE_COUNT; i++) {
+  const i3 = i * 3;
+
+  // soft Z correction (keeps particles in visible band)
+  arr[i3 + 2] *= 0.995;
+
+  if (arr[i3 + 2] > depthClamp) arr[i3 + 2] = depthClamp;
+  if (arr[i3 + 2] < -depthClamp) arr[i3 + 2] = -depthClamp;
+}
+
   // random drift (safe)
   velocities[i3] += (Math.random() - 0.5) * 0.2;
   velocities[i3 + 1] += (Math.random() - 0.5) * 0.2;
