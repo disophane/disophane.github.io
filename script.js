@@ -120,6 +120,10 @@ if (heroCard) {
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(CONFIG.PARTICLE_COUNT * 3);
   const velocities = new Float32Array(CONFIG.PARTICLE_COUNT * 3);
+  const colors = new Float32Array(CONFIG.PARTICLE_COUNT * 3);
+
+  const colorNear = new THREE.Color(0xff2136);
+  const colorFar = new THREE.Color(0x050508);
 
   for (let i = 0; i < CONFIG.PARTICLE_COUNT; i++) {
     const i3 = i * 3;
@@ -131,20 +135,49 @@ if (heroCard) {
     velocities[i3] = (Math.random() - 0.5) * 4;
     velocities[i3 + 1] = (Math.random() - 0.5) * 4;
     velocities[i3 + 2] = (Math.random() - 0.5) * 4;
+
+    const t = Math.random();
+    const c = colorNear.clone().lerp(colorFar, t);
+
+    colors[i3] = c.r;
+    colors[i3 + 1] = c.g;
+    colors[i3 + 2] = c.b;
   }
 
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  // ---------------- FIXED CIRCULAR PARTICLE TEXTURE ----------------
+
+  const texCanvas = document.createElement('canvas');
+  texCanvas.width = 64;
+  texCanvas.height = 64;
+
+  const ctx = texCanvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.4, 'rgba(255,255,255,0.8)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 64, 64);
+
+  const texture = new THREE.CanvasTexture(texCanvas);
 
   const material = new THREE.PointsMaterial({
-    size: 0.35
+    size: 0.35,
+    vertexColors: true,
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
   });
 
   const particles = new THREE.Points(geometry, material);
   scene.add(particles);
 
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-
-  // ---------------- SMOOTH SCROLL FIX (FPS INDEPENDENT) ----------------
 
   let scrollFactor = 0;
   let scrollTarget = 0;
@@ -172,11 +205,9 @@ if (heroCard) {
 
     const delta = clock.getDelta();
 
-    // smooth mouse
     mouse.x += (mouse.tx - mouse.x) * CONFIG.MOUSE_LERP;
     mouse.y += (mouse.ty - mouse.y) * CONFIG.MOUSE_LERP;
 
-    // FPS-INDEPENDENT SCROLL SMOOTHING
     const scrollSpeed = 8;
     scrollFactor += (scrollTarget - scrollFactor) * (1 - Math.exp(-scrollSpeed * delta));
 
@@ -185,7 +216,6 @@ if (heroCard) {
     camera.position.x = mouse.x * 5;
     camera.position.y = mouse.y * 5;
 
-    // FPS-INDEPENDENT CAMERA ZOOM SMOOTHING
     camera.position.z += (targetZ - camera.position.z) * (1 - Math.exp(-10 * delta));
 
     camera.lookAt(0, 0, 0);
