@@ -24,13 +24,13 @@
     <div class="app-shell">
       <div class="bg-orbit bg-orbit--one"></div>
       <div class="bg-orbit bg-orbit--two"></div>
-      <div class="bg-noise"></div>
+      <!-- <div class="bg-noise"></div>  -->
 
       <!-- SECTION: Header / Nav -->
       <header class="site-header">
         <div class="container header-inner">
           <div class="logo-lockup">
-            <div class="logo-mark">TLMC</div>
+            <div class="logo-mark">R</div>
             <div class="logo-text">
               <span class="logo-name">Zayan Mohamed</span>
               <span class="logo-tagline">Developer</span>
@@ -73,9 +73,9 @@
                   <span class="meta-label">Focus</span>
                   <span class="meta-value">Frontend • Motion • WebGL</span>
                 </div>
-                <div class="meta-pill">
+                <div class="meta-pill meta-pill--interactive" id="particlesToggle">
                   <span class="meta-label">Particles</span>
-                  <span class="meta-value meta-value--live">Live</span>
+                  <span class="meta-value meta-value--live" id="particlesStatus">On</span>
                 </div>
               </div>
             </div>
@@ -103,7 +103,7 @@
               <h2 class="section-title">Projects</h2>
               <p class="section-subtitle">
                 Each project card here is a placeholder as of now and it is not interactive yet.
-                <code>.project-card</code> block in the HTML to add more.
+                <code>.project-card</code>  
               </p>
             </header>
 
@@ -211,8 +211,8 @@
                 <input
                   id="targetUrl"
                   class="field-input"
-                  type="url"
-                  placeholder="https://example.com"
+                  type="text"
+                  placeholder="example.com, 192.168.1.1, or https://example.com"
                   autocomplete="off"
                 />
 
@@ -234,6 +234,30 @@
                 <button id="pingButton" class="btn btn--primary btn--full">
                   Ping &amp; Inspect
                 </button>
+
+                <div class="api-section">
+                  <p class="field-label">Performance Tests</p>
+                  <div class="api-button-row">
+                    <button id="ttfbButton" class="btn btn--flat btn--full">TTFB</button>
+                    <button id="dnsButton" class="btn btn--flat btn--full">DNS Lookup</button>
+                    <button id="weightButton" class="btn btn--flat btn--full">Page Weight</button>
+                  </div>
+                </div>
+
+                <div class="api-section">
+                  <p class="field-label">Security &amp; Network</p>
+                  <button id="securityButton" class="btn btn--flat btn--full">
+                    Inspect Security &amp; Network
+                  </button>
+                </div>
+
+                <div class="api-section">
+                  <p class="field-label">Meta Scraping</p>
+                  <button id="previewButton" class="btn btn--flat btn--full">
+                    Generate Link Preview
+                  </button>
+                </div>
+
                 <p class="ping-note">
                   This feature uses multiple built-in proxy endpoints with
                   automatic failover. If one proxy fails or is blocked,
@@ -275,6 +299,32 @@
                     </div>
                     <pre id="pingHeaders" class="ping-code-block">{}</pre>
                   </div>
+                </div>
+
+                <div class="security-grid">
+                  <div class="api-card">
+                    <p class="card-label">SSL Expiration</p>
+                    <pre id="sslExpiry" class="ping-code-block">{}</pre>
+                  </div>
+                  <div class="api-card">
+                    <p class="card-label">Security Headers</p>
+                    <pre id="securityHeaders" class="ping-code-block">{}</pre>
+                  </div>
+                  <div class="api-card">
+                    <p class="card-label">Server IP &amp; Geo</p>
+                    <pre id="geoIp" class="ping-code-block">{}</pre>
+                  </div>
+                  <div class="api-card">
+                    <p class="card-label">DNS Records</p>
+                    <pre id="dnsRecords" class="ping-code-block">{}</pre>
+                  </div>
+                </div>
+
+                <div class="ping-panel">
+                  <div class="ping-panel-header">
+                    <span>Link Preview</span>
+                  </div>
+                  <pre id="previewResult" class="ping-code-block">{}</pre>
                 </div>
               </div>
             </div>
@@ -330,7 +380,7 @@
       <footer class="site-footer">
         <div class="container footer-inner">
           <p class="footer-text">
-            &copy; <span id="year"></span>TLMC
+            &copy; <span id="year"></span> TLMC
           </p>
         </div>
       </footer>
